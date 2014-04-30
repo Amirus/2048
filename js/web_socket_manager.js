@@ -1,10 +1,11 @@
 function WebSocketManager() {
   this.events = {};
+  this.conn = null;
+  this.retryConnectMillis = 2000;
 
   // This should be the endpoint of the router server
   this.routeEndpoint = "http://" + window.location.hostname + ":6969/route";
   console.log(this.routeEndpoint);
-  this.conn = null;
 }
 
 WebSocketManager.prototype.on = function (event, callback) {
@@ -37,11 +38,17 @@ WebSocketManager.prototype.startSocketConnection = function () {
     conn = new WebSocket(socketEndpoint);
     console.log("sockets are a go-go");
     conn.onclose = function(evt) {
-      self.startSocketConnection();
+      setTimeout(function () {
+        self.startSocketConnection();
+      }, self.retryConnectMillis);
     };
     conn.onmessage = function(evt) {
       console.log(evt.data);
       self.emit("changeState", JSON.parse(evt.data));
     };
+  }).fail(function () {
+    setTimeout(function () {
+      self.startSocketConnection();
+    }, self.retryConnectMillis);
   });
 }
