@@ -3,6 +3,7 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager   = new InputManager;
   this.storageManager = new StorageManager;
   this.actuator       = new Actuator;
+  this.webSocketManager = new WebSocketManager;
 
   this.startTiles     = 2;
 
@@ -10,8 +11,38 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
+  this.webSocketManager.startSocketConnection();
+  this.webSocketManager.on("changeState", this.changeState.bind(this));
+
   this.setup();
 }
+
+// Change game state to passed in params
+GameManager.prototype.changeState = function (gameState) {
+  this.storageManager.clearGameState();
+
+  if (gameState) {
+    console.log("New state from server")
+    this.grid        = new Grid(gameState.grid.size,
+                                gameState.grid.cells); // Reload grid
+    this.score       = gameState.score;
+    this.over        = gameState.over;
+    this.won         = gameState.won;
+  } else {
+    console.log("First client")
+    this.grid        = new Grid(this.size);
+    this.score       = 0;
+    this.over        = false;
+    this.won         = false;
+    this.keepPlaying = false;
+
+    // Add the initial tiles
+    this.addStartTiles();
+  }
+
+  // Update the actuator
+  this.actuate();
+};
 
 // Restart the game
 GameManager.prototype.restart = function () {
@@ -186,7 +217,9 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
-    this.actuate();
+    // Instead of updating the board, send it to the server to be committed
+    // BEFORE: this.actuate();
+    this.webSocketManager.send(this.serialize());
   }
 };
 
