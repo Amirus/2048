@@ -3,6 +3,7 @@ function WebSocketManager() {
 
   // This should be the endpoint of the router server
   this.routeEndpoint = "http://" + window.location.hostname + ":6969/route";
+  console.log(this.routeEndpoint);
   this.conn = null;
 }
 
@@ -30,7 +31,8 @@ WebSocketManager.prototype.startSocketConnection = function () {
   var self = this;
 
   $.getJSON(this.routeEndpoint, function (json) {
-    var socketEndpoint = "ws://localhost:" + json.port;
+    var socketEndpoint = "ws://" + window.location.hostname + ":" + json.port;
+    console.log(socketEndpoint);
     console.log("make socket connection");
     conn = new WebSocket(socketEndpoint);
     console.log("sockets are a go-go");
