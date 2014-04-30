@@ -43,7 +43,6 @@ WebSocketManager.prototype.startSocketConnection = function () {
       }, self.retryConnectMillis);
     };
     conn.onmessage = function(evt) {
-      console.log(evt.data);
       self.emit("changeState", JSON.parse(evt.data));
     };
   }).fail(function () {
