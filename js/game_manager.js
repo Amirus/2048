@@ -22,14 +22,14 @@ GameManager.prototype.changeState = function (gameState) {
   this.storageManager.clearGameState();
 
   if (gameState) {
-    console.log("New state from server")
+    console.log("New state from server");
     this.grid        = new Grid(gameState.grid.size,
                                 gameState.grid.cells); // Reload grid
     this.score       = gameState.score;
     this.over        = gameState.over;
     this.won         = gameState.won;
   } else {
-    console.log("First client")
+    console.log("First client");
     this.grid        = new Grid(this.size);
     this.score       = 0;
     this.over        = false;
