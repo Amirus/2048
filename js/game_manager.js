@@ -11,6 +11,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
+  this.actuator.on("restart", this.restart.bind(this));
+
   this.webSocketManager.startSocketConnection();
   this.webSocketManager.on("changeState", this.changeState.bind(this));
 
